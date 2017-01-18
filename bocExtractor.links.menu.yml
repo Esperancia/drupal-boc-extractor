@@ -1,0 +1,5 @@
+bocExtractor.link:
+  title: 'bocExtractor'
+  description: 'Ce plugin vous aidera à récupérer quotidiennement et automatiquement les bulletins officiels de la côte de la BRVM, en PDF. Prenez un instant pour paramétrer afin de mieux cibler ce que vous rechercher.'
+  parent: system.admin_structure
+  route_name: bocExtractor.routing

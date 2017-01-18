@@ -1,0 +1,7 @@
+bocExtractor.routing:
+  path: '/admin/structure/bocextractor'
+  defaults:
+    _title: 'boc Extractor'
+    _controller: '\Drupal\bocExtractor\Controller\BocExtractorController::boc_form'
+  requirements:
+    _permission: 'access administration pages'

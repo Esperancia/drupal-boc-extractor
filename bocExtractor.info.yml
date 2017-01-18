@@ -1,0 +1,4 @@
+name: 'Boc Extractor'
+type: module
+description: 'Ce plugin vous aidera à récupérer quotidiennement et automatiquement les bulletins officiels de la côte de la BRVM.'
+core: 8.x
