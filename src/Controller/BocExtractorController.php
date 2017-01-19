@@ -3,8 +3,6 @@
 	namespace Drupal\bocExtractor\Controller;
 
 	class BocExtractorController {
-
-		private $options;
 		
 		public static function test() {
 			return array(
@@ -13,31 +11,41 @@
 				);
 		}
 
-		public static function boc_form() {
-			$form['BocExtractor_description'] = array(
-			    '#title' => t('Drupal Boc extractor Settings'), 
-			    '#markup' => t('Personnalisez les liens de publications de BOCs au cas la BRVM changeait de site!'),
-			);
+		public static function DisplayBocExtractorSettingsForm() {
+			$form_class = '\Drupal\bocExtractor\Form\BocExtractorSettingsForm';
+			$build['form'] = \Drupal::formBuilder()->getForm($form_class);
+			$build['#title'] = t('Boc Extractor Settings');
+			$build['#markup'] = t('Personnalisez les liens de publications de BOCs au cas la BRVM changeait de site.');
 
-			$form['BocExtractor_url'] = array(
-				'#type' => 'textfield', 
-				'#title' => t('Lien page des publications de Bulletins Officiels de la Côte:'), 
-				'#default_value' => '',
-			);
-			    
-			$form['BocExtractor_class'] = array(
-				'#title' => t('Classe CSS commune aux liens de publications des Bulletins Officiels de la Côte:'),
-			    '#type' => 'textfield'
-			);
-
-			$form['submit_button'] = array( 
-			    '#type' => 'submit',
-			    '#value' => t('ENREGISTRER LA CONFIGURATION'),
-			);
-			  
-			return $form;
-			// return system_settings_form($form);
+			return $build;
 		}
+
+
+		// To render a simple form into controller:
+		// public static function boc_form() {
+		// 	$form['BocExtractor_description'] = array(
+		// 	    '#title' => t('Drupal Boc extractor Settings'), 
+		// 	    '#markup' => t('Personnalisez les liens de publications de BOCs au cas la BRVM changeait de site!'),
+		// 	);
+
+		// 	$form['BocExtractor_url'] = array(
+		// 		'#type' => 'textfield', 
+		// 		'#title' => t('Lien page des publications de Bulletins Officiels de la Côte:'), 
+		// 		'#default_value' => '',
+		// 	);
+			    
+		// 	$form['BocExtractor_class'] = array(
+		// 		'#title' => t('Classe CSS commune aux liens de publications des Bulletins Officiels de la Côte:'),
+		// 	    '#type' => 'textfield'
+		// 	);
+
+		// 	$form['submit_button'] = array( 
+		// 	    '#type' => 'submit',
+		// 	    '#value' => t('Enregistrer la configuration'),
+		// 	);
+			  
+		// 	return $form;
+		// }
 
 		/* fonctions */
 		public static function get_boc() {
