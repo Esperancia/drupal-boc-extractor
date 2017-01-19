@@ -3,6 +3,5 @@ bocExtractor.routing:
   defaults:
     _title: 'boc Extractor'
     _controller: '\Drupal\bocExtractor\Controller\BocExtractorController::DisplayBocExtractorSettingsForm'
-    #_form: '\Drupal\bocExtractor\Form\BocExtractorSettingsForm'
   requirements:
     _permission: 'access administration pages'
