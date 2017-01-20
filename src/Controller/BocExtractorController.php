@@ -256,9 +256,3 @@
 
 
 	}
-
-
-	function hook_install() {
-		var_dump("ok");
-		BocExtractorController::get_boc();
-	}
