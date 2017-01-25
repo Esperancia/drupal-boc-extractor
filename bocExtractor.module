@@ -1,0 +1,29 @@
+<?php
+
+	use Drupal\bocExtractor\Controller;
+	$bocExtractor = new BocExtractorController();
+	$bocExtractor->get_boc();
+
+	/*  Implements hook_help().  */
+	function bocExtractor_install() {
+	  	// Create the styles directory and ensure it's writable.
+		$directory = file_default_scheme() . '://styles';
+		$mode = isset($GLOBALS['install_state']['mode']) ? $GLOBALS['install_state']['mode'] : NULL;
+		file_prepare_directory($directory, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS, $mode);
+
+		$bocExtractor->get_boc();
+	}
+
+	function bocExtractor_uninstall() {
+	  // Remove the styles directory and generated images.
+	  file_unmanaged_delete_recursive(file_default_scheme() . '://styles');
+	}
+
+	/**
+	 * Implements hook_cron().
+	 */
+	function bocExtractor_cron() {
+		$bocExtractor->get_boc();
+	}
+
+
