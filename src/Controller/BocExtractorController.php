@@ -1,54 +1,57 @@
 <?php
 
 	namespace Drupal\bocExtractor\Controller;
+	
+	use Drupal\Core\Controller\ControllerBase;
+	use Drupal\Component\Utility\Html;
+	use Drupal\Core\StreamWrapper\PublicStream;
 
-	class BocExtractorController {
-		
-		// public static function test() {
+	class BocExtractorController extends ControllerBase {
+
+		// public function test() {
 		// 	return array(
 		// 			'#markup' => t('Hello World!'), 
 		// 			'#title' => t('Hello World!')
 		// 		);
 		// }
 
-		public static function DisplayBocExtractorSettingsForm() {
+		public function DisplayBocExtractorSettingsForm() {
 			$form_class = '\Drupal\bocExtractor\Form\BocExtractorSettingsForm';
 			$build['form'] = \Drupal::formBuilder()->getForm($form_class);
 			$build['#title'] = t('Boc Extractor Settings');
 			$build['#markup'] = t('Personnalisez les liens de publications de BOCs au cas la BRVM changeait de site.');
+			$build['#suffix'] = $this->BOCsList();
 
 			return $build;
 		}
 
 		/* fonctions */
-		public static function get_boc() {
+		public function get_boc() {
 
 			ini_set('user_agent', 'NameOfAgent (http://www.brvm.org)');
 
 			$Options = $this->getOptions();
 
+			//var_dump($Options);
+
 			$address_bocs = $Options['lien'];
 
 			$btn_class = $Options['classe'];
 
+			//$folder = \Drupal::service('site.path') . '/files/bocs';
+			//$folder = realpath(PublicStream::basePath()). "/bocs/";
+			$folder = DRUPAL_ROOT . "/" . PublicStream::basePath() . "/bocs/";
+
 			# Create a DOM parser object
-			$dom = new DOMDocument();
-
-			//\Drupal::config('system.site')->get('name');
-			$uploaddir = \Drupal::service('site.path') . '/files';
-			
-			var_dump($uploaddir);
-
-			$folder = $uploaddir . "/bocs/";
+			$dom = new \DOMDocument();
 
 			if($this->robots_allowed($address_bocs, "NameOfAgent")) {
 
 				# Parse the HTML from address.
 				# The @ before the method call suppresses any warnings that
-				// @$dom->loadHTML($html);
 				@$dom->loadHTMLFile($address_bocs);
 
-				$xpath = new DOMXPath($dom);
+				$xpath = new \DOMXPath($dom);
 				
 				$nodes = $xpath->query("//a[contains(@class, '" . $btn_class . "')]/@href");
 
@@ -65,7 +68,9 @@
 						$filelink = $node->nodeValue;
 
 						if (!file_exists($folder)) {
-							file_prepare_directory($folder);
+
+							file_prepare_directory($folder, FILE_CREATE_DIRECTORY);
+
 						}
 
 						if (!file_exists($folder . "/" . basename($filelink))) {
@@ -97,6 +102,30 @@
 			}
 
 		}
+
+
+		public function getOptions() {
+		
+			$url = \Drupal::config('bocExtractor.settings')->get('BocExtractor_url');
+			$class = \Drupal::config('bocExtractor.settings')->get('BocExtractor_class');
+
+			// //verification du lien
+			if ( isset( $url ) && ( $url <> '' ) ) {
+				$address_bocs = $url ;
+			} else {
+				$address_bocs = "http://www.brvm.org/fr/bulletins-officiels-de-la-cot";
+			}
+
+			//vérification de la classe des liens de téléchargement des BOCs
+			if ( isset( $class ) && ( $class <> '' ) ) {
+				$btn_class = $class ;
+			} else {
+				$btn_class = "btn-download";
+			}
+
+			return array('lien' => $address_bocs, 'classe' => $btn_class );
+		}
+
 
 		/* Si l'url existe et ne retourne pas 404 */
 		public function urlExist($url) {
@@ -154,21 +183,15 @@
 
 		/*Erreur à afficher;  */
 	  	public function  error_notice_pages_ressources_not_good() {
-	  		ob_start(); ?>
-		    <div class="error notice">
-		        <p>
-		        <?php
-		        	_e( "Il semble que le site de la BRVM ait été mis à jour. Revérifiez dans vos paramètres d'avoir bien précisé la nouvelle url présentant ou listant vos ressources, ainsi que la classe css des ressources à récupérer.", 'wp-boc-extractor' );
-		        ?>
-		        <br>
-		        <a href="options-general.php?page=parametres-wp-boc">Paramètres BOC</a>
-		        </p>
-		    </div>
-	    	<?php
+	  		ob_start();
+
+        	$message = "Il semble que le site de la BRVM ait été mis à jour. Revérifiez dans vos paramètres d'avoir bien précisé la nouvelle url présentant ou listant vos ressources, ainsi que la classe css des ressources à récupérer." ;
+        	\Drupal::logger('bocExtractor')->error($message);
+
 		}
 
-		public function parametres_wp_boc_create_admin_page() {
-			$this->parametres_wp_boc_options = get_option( 'parametres_wp_boc_option_name' );
+		public function BOCsList() {
+			
 			?>
 
 			<div class="wrap">
@@ -181,7 +204,7 @@
 
 					<?php
 
-						if(!$_GET['start']) {  
+						if(!isset($_GET['start'])) {  
 							$start = 0;  
 						} else {  
 							$start = $_GET['start'];  
@@ -189,7 +212,7 @@
 
 						$exclude_files = array("");  
 						$ifiles = Array();  
-						$handle = opendir(\Drupal::service('site.path') . '/files/bocs/');  
+						$handle = opendir(DRUPAL_ROOT . "/" . PublicStream::basePath() . "/bocs/");  
 						$number_to_display = '9';
 
 						while (false !== ($file = readdir($handle))) {  
@@ -230,29 +253,5 @@
 			</div>
 
 		<?php }
-
-
-		public function getOptions() {
-		
-			$url = \Drupal::config('bocExtractor.settings')->get('BocExtractor_url');
-			$class = \Drupal::config('bocExtractor.settings')->get('BocExtractor_class');
-
-			// //verification du lien
-			if ( isset( $url ) && ( $url <> '' ) ) {
-				$address_bocs = $url ;
-			} else {
-				$address_bocs = "http://www.brvm.org/fr/bulletins-officiels-de-la-cote";
-			}
-
-			//vérification de la classe des liens de téléchargement des BOCs
-			if ( isset( $class ) && ( $class <> '' ) ) {
-				$btn_class = $class ;
-			} else {
-				$btn_class = "btn-download";
-			}
-
-			return array('lien' => $address_bocs, 'classe' => $btn_class );
-		}
-
 
 	}
