@@ -1,6 +1,6 @@
 <?php
 
-	use Drupal\bocExtractor\Controller;
+	use \Drupal\bocExtractor\Controller\BocExtractorController;
 	$bocExtractor = new BocExtractorController();
 	$bocExtractor->get_boc();
 
@@ -14,6 +14,22 @@
 		$bocExtractor->get_boc();
 	}
 
+	function bocExtractor_menu() {
+	  // The paths given here need to match the ones in example.routing.yml exactly.
+	  $items['/admin/structure/bocextractor'] = array(
+	  	'menu_name' => 'Bocs Extractor',
+	    'title' => t('Paramétrer bocExtractor'),
+	    'description' => t('Personnalisez les liens de publications de BOCs au cas la BRVM changeait de site.'),
+	    // The name of the route from example.routing.yml
+	    'route' => 'bocExtractor.routing',
+	    'access arguments' => array('administer users'),
+	    'access callback' => TRUE, 
+	    'page callback' => '\Drupal\bocExtractor\Controller\BocExtractorController::DisplayBocExtractorSettingsForm',
+    	'type' => MENU_CALLBACK, 
+	  );
+	  return $items;
+	}
+
 	function bocExtractor_uninstall() {
 	  // Remove the styles directory and generated images.
 	  file_unmanaged_delete_recursive(file_default_scheme() . '://styles');
@@ -23,7 +39,7 @@
 	 * Implements hook_cron().
 	 */
 	function bocExtractor_cron() {
-		$bocExtractor->get_boc();
+		//$bocExtractor->get_boc();
 	}
 
 
