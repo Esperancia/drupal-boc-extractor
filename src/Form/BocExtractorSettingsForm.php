@@ -29,6 +29,10 @@
 		public function buildForm(array $form, FormStateInterface $form_state) {
 		    $config = $this->config('bocExtractor.settings');
 
+		    $form['Description'] = array(
+		    	'#prefix' => $this->t('Personnalisez le lien de publications et les classes CSS des BOCs au cas la BRVM changeait de site.'),
+		    ); 
+
 		    $form['BocExtractor_url'] = array(
 		      '#type' => 'textfield',
 		      '#title' => $this->t('BOCs url'),
