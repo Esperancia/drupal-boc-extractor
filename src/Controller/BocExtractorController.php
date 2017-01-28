@@ -8,19 +8,12 @@
 
 	class BocExtractorController extends ControllerBase {
 
-		// public function test() {
-		// 	return array(
-		// 			'#markup' => t('Hello World!'), 
-		// 			'#title' => t('Hello World!')
-		// 		);
-		// }
-
 		public function DisplayBocExtractorSettingsForm() {
+			$output = array();
 			$form_class = '\Drupal\bocExtractor\Form\BocExtractorSettingsForm';
 			$build['form'] = \Drupal::formBuilder()->getForm($form_class);
 			$build['#title'] = t('Boc Extractor Settings');
-			$build['#markup'] = t('Personnalisez les liens de publications de BOCs au cas la BRVM changeait de site.');
-			$build['#suffix'] = $this->BOCsList();
+			$build['#markup'] = $this->BOCsList();
 
 			return $build;
 		}
@@ -186,7 +179,10 @@
 	  		ob_start();
 
         	$message = "Il semble que le site de la BRVM ait été mis à jour. Revérifiez dans vos paramètres d'avoir bien précisé la nouvelle url présentant ou listant vos ressources, ainsi que la classe css des ressources à récupérer." ;
-        	\Drupal::logger('bocExtractor')->error($message);
+        	
+        	\Drupal::logger('bocExtractor')->error(t($message));
+
+        	drupal_set_message(t($message), 'error', TRUE);
 
 		}
 
